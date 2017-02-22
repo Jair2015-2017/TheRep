@@ -2,11 +2,10 @@ package sr.unasat.financialapp.db.schema;
 
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_TABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_ID;
-import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_TABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_ID;
-import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_TABLE;
 
 public class Schema {
     public static final String DATABASE_NAME = "untitledBP_database.db";
@@ -40,7 +39,7 @@ public class Schema {
                         +CREATED+" string not null, "
                         + CUR_ID +" integer , "
                         +DELETED+" string, " +
-                        "FOREIGN KEY ("+CUR_ID+") REFERENCES "+CUR_TABLE+"("+CUR_ID+")); ";
+                        "FOREIGN KEY ("+CUR_ID+") REFERENCES "+CURTABLE+"("+CUR_ID+")); ";
 
         public static final String DROP_USERTABLE = "drop table if exists "+USER_TABLE;
 
@@ -109,20 +108,20 @@ public class Schema {
 
     public class SchemaCurrency{
 
-        public static final String CUR_TABLE = "currency_table";
+        public static final String CURTABLE = "currency_table";
         public static final String CUR_ID = "cur_id";
         public static final String COUNTRY = "country";
         public static final String CURRENCY = "currency";
         public static final String CUR_LOGO = "cur_logo";
 
         public static final String CREATE_CURTABLE =
-                "create table "+ CUR_TABLE +" ( "+ CUR_ID +" integer primary key, "
+                "create table "+ CURTABLE +" ( "+ CUR_ID +" integer primary key, "
                         + COUNTRY +" string not null unique, "
                         + CURRENCY +" string , "
                         + CUR_LOGO +" string, "
                         +USER_ID +" string not null); ";
 
-        public static final String DROP_CURTABLE = "drop table if exists "+ CUR_TABLE;
+        public static final String DROP_CURTABLE = "drop table if exists "+ CURTABLE;
 
 
     }
