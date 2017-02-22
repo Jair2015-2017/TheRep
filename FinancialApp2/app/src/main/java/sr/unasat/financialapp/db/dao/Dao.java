@@ -4,9 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
-
-import sr.unasat.financialapp.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static sr.unasat.financialapp.db.schema.Schema.DATABASE_NAME;

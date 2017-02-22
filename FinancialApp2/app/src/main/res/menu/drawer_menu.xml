@@ -10,9 +10,13 @@
         android:title="@string/balance"
         />
     <item
-        android:id="@+id/budgets"
-        android:title="@string/reports"
+        android:id="@+id/budgets_item"
+        android:title="@string/budgets"
         />
+        <item
+            android:id="@+id/reports_item"
+            android:title="@string/reports"
+            />
     <item
         android:id="@+id/categories"
         android:title="@string/categories"

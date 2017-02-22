@@ -1,4 +1,4 @@
-package sr.unasat.financialapp.fragments;
+package sr.unasat.financialapp.activities.main.fragments;
 
 
 import android.os.Bundle;
@@ -10,12 +10,6 @@ import android.view.ViewGroup;
 import sr.unasat.financialapp.R;
 
 public class OverviewFragment extends Fragment {
-
-
-    public OverviewFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
