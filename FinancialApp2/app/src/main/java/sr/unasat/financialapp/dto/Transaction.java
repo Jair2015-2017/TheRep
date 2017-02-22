@@ -1,10 +1,7 @@
 package sr.unasat.financialapp.dto;
 
-/**
- * Created by Jair on 2/22/2017.
- */
-
 public class Transaction {
+
     private long tran_id;
     private String tran_name;
     private double tran_amount;
