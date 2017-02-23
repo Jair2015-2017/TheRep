@@ -15,10 +15,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import sr.unasat.financialapp.R;
 import sr.unasat.financialapp.db.dao.Dao;
@@ -89,11 +91,21 @@ public class AddTransactionDialog extends DialogFragment {
 
             String transactionName= String.valueOf(transactionNameView.getText());
             double transactionAmount = Double.valueOf(String.valueOf(transactionAmountView.getText()));
-            String date = String.valueOf(Calendar.getInstance().getTime());
+
+
+            Date date = Calendar.getInstance().getTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("E yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+            String customDate=null;
+            try {
+                customDate = dateFormat.format(date);
+
+            }catch (Exception e){
+                Log.i(TAG, "addTransaction:"+e);
+            }
             ContentValues contentValues = new ContentValues();
             contentValues.put(TRAN_NAME,transactionName);
             contentValues.put(TRAN_AMOUNT,transactionAmount);
-            contentValues.put(DATE,date);
+            contentValues.put(DATE,customDate);
             contentValues.put(CAT_ID,category.getId());
 
             if (dao.insertTransaction(contentValues))

@@ -25,7 +25,7 @@
         android:layout_marginStart="12dp"
         android:id="@+id/transaction_name"
         android:textStyle="normal|bold"
-        android:textSize="24sp"
+        android:textSize="14sp"
         android:layout_alignTop="@+id/category_icon"
         android:layout_toRightOf="@+id/category_icon"
         android:layout_toEndOf="@+id/category_icon" />
@@ -35,20 +35,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/transaction_descr"
-        android:layout_below="@+id/category_icon"
+        android:layout_alignBottom="@+id/category_icon"
         android:layout_alignLeft="@+id/transaction_name"
-        android:layout_alignStart="@+id/transaction_name" />
+        android:layout_alignStart="@+id/transaction_name"
+        android:textAlignment="viewStart" />
 
     <TextView
         android:text="0.00"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/transaction_value"
-        android:textSize="30sp"
+        android:textSize="14sp"
         android:textStyle="normal|bold"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/transaction_name"
-        android:layout_toEndOf="@+id/transaction_name"
-        android:layout_marginLeft="53dp"
-        android:layout_marginStart="53dp" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="71dp"
+        android:layout_marginEnd="71dp" />
 </RelativeLayout>

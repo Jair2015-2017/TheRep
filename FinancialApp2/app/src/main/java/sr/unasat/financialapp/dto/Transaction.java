@@ -2,7 +2,7 @@ package sr.unasat.financialapp.dto;
 
 public class Transaction {
 
-    private long tran_id;
+    private int tran_id;
     private String tran_name;
     private double tran_amount;
     private String tran_date;
@@ -13,7 +13,7 @@ public class Transaction {
 
     }
 
-    public Transaction(long tran_id, String tran_name, double tran_amount, String tran_date, User user, Category category) {
+    public Transaction(int tran_id, String tran_name, double tran_amount, String tran_date, User user, Category category) {
         this.tran_id = tran_id;
         this.tran_name = tran_name;
         this.tran_amount = tran_amount;
@@ -22,11 +22,11 @@ public class Transaction {
         this.category = category;
     }
 
-    public long getTran_id() {
+    public int getTran_id() {
         return tran_id;
     }
 
-    public void setTran_id(long tran_id) {
+    public void setTran_id(int tran_id) {
         this.tran_id = tran_id;
     }
 

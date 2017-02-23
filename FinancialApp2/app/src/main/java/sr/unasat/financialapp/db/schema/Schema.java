@@ -25,7 +25,6 @@ public class Schema {
         public static final String OPENING = "opening";
         public static final String TRANSACTIONS = "transactions";
         public static final String CLOSING = "closing";
-        public static final String CURRENCY = "currency";
 
         public static final String CREATE_USERTABLE =
                 "create table "+USER_TABLE+" ( "+ USER_ID +" integer primary key, "
@@ -36,7 +35,7 @@ public class Schema {
                         +OPENING+" double , "
                         +TRANSACTIONS+" double , "
                         +CLOSING+" double , "
-                        +CREATED+" string not null, "
+                        +CREATED+" string, "
                         + CUR_ID +" integer , "
                         +DELETED+" string, " +
                         "FOREIGN KEY ("+CUR_ID+") REFERENCES "+CURTABLE+"("+CUR_ID+")); ";
@@ -54,10 +53,10 @@ public class Schema {
 
         public static final String CREATE_CATTABLE =
                 "create table "+CAT_TABLE+" ( "+CAT_ID+" integer primary key, "
-                        + CAT_NAME +" string not null unique, "
+                        + CAT_NAME +" string, "
                         + CAT_DESCR +" string , "
-                        + BUDGET +" string, "
-                        +USER_ID +" string not null, "
+                        + BUDGET +" double, "
+                        +USER_ID +" integer, "
                         +"FOREIGN KEY ("+USER_ID+") REFERENCES "+CAT_TABLE+"("+USER_ID+")); ";
 
         public static final String DROP_CATTABLE = "drop table if exists "+CAT_TABLE;
@@ -76,7 +75,7 @@ public class Schema {
                         + TRAN_NAME +" string, "
                         + TRAN_DESCR +" string, "
                         + TRAN_AMOUNT +" double, "
-                        +DATE +" string not null, "
+                        +DATE +" string, "
                         +CAT_ID +" integer, "
                         +"FOREIGN KEY ("+CAT_ID+") REFERENCES "+CAT_TABLE+"("+CAT_ID+"));";
 
@@ -116,10 +115,10 @@ public class Schema {
 
         public static final String CREATE_CURTABLE =
                 "create table "+ CURTABLE +" ( "+ CUR_ID +" integer primary key, "
-                        + COUNTRY +" string not null unique, "
+                        + COUNTRY +" string, "
                         + CURRENCY +" string , "
                         + CUR_LOGO +" string, "
-                        +USER_ID +" string not null); ";
+                        +USER_ID +" integer); ";
 
         public static final String DROP_CURTABLE = "drop table if exists "+ CURTABLE;
 

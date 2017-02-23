@@ -6,15 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import sr.unasat.financialapp.dto.Category;
 import sr.unasat.financialapp.dto.Currency;
 import sr.unasat.financialapp.dto.Transaction;
 import sr.unasat.financialapp.dto.User;
-
 import static android.content.ContentValues.TAG;
 import static sr.unasat.financialapp.db.schema.Schema.DATABASE_NAME;
 import static sr.unasat.financialapp.db.schema.Schema.DATABASE_VERSION;
@@ -24,15 +21,19 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_NAME;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_TABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CREATE_CATTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.DROP_CATTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.COUNTRY;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CREATE_CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CURRENCY;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_LOGO;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.DROP_CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.CREATE_REPTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.DROP_REPTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.CREATE_TRANTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DATE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DROP_TRANTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_AMOUNT;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_DESCR;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_ID;
@@ -41,6 +42,7 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_TAB
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CLOSING;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CREATED;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CREATE_USERTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.DROP_USERTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.EMAIL;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.NAME_USER;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.OPENING;
@@ -55,10 +57,12 @@ public class Dao extends SQLiteOpenHelper {
     public Dao(Context context) {
 
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
 
         db.execSQL(CREATE_USERTABLE);
         db.execSQL(CREATE_TRANTABLE);
@@ -66,14 +70,48 @@ public class Dao extends SQLiteOpenHelper {
         db.execSQL(CREATE_REPTABLE);
         db.execSQL(CREATE_CURTABLE);
 
-        Log.i(TAG, "onCreate: succesfull");
-        // setDefaultCategories();
-        // setDefaultCurrencies();
 
+        setDefaultUser(db);
+        setDefaultCategories(db);
+        // setDefaultCurrencies();
+        Log.i(TAG, "onCreate: succesfull");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        db.execSQL(DROP_USERTABLE);
+        db.execSQL(DROP_TRANTABLE);
+        db.execSQL(DROP_CATTABLE);
+        db.execSQL(DROP_REPTABLE);
+        db.execSQL(DROP_CURTABLE);
+
+        db.execSQL(CREATE_USERTABLE);
+        db.execSQL(CREATE_TRANTABLE);
+        db.execSQL(CREATE_CATTABLE);
+        db.execSQL(CREATE_REPTABLE);
+        db.execSQL(CREATE_CURTABLE);
+    }
+
+    private void setDefaultCategories(SQLiteDatabase db){
+
+        insertCategory(db,"no category",null,0);
+        insertCategory(db,"income","all income",0);
+        insertCategory(db,"food","food expenses",300);
+        insertCategory(db,"clothing","clothing expenses",300);
+        insertCategory(db,"entertainment","entertainment expenses",300);
+
+
+
+    }
+
+    private void setDefaultUser(SQLiteDatabase db){
+
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(EMAIL,"email");
+        contentValues.put(PASSWORD,"0000");
+
+        db.insert(USER_TABLE, null, contentValues);
 
     }
 
@@ -196,7 +234,18 @@ public class Dao extends SQLiteOpenHelper {
     public boolean insertTransaction(ContentValues contentValues){
 
         SQLiteDatabase db = getWritableDatabase();
-        return db.insert(TRAN_TABLE, null, contentValues)>0;
+
+        String date = String.valueOf(contentValues.get(DATE));
+
+        if (db.insert(TRAN_TABLE, null, contentValues)>0){
+            Transaction transaction = getLastTransaction();
+            reportTrigger(date,transaction.getTran_id());
+            return true;
+        }else {
+            return false;
+        }
+
+
     }
 
     public Transaction getTransactionByID( int id ){
@@ -271,5 +320,55 @@ public class Dao extends SQLiteOpenHelper {
         }
 
         return list;
+    }
+
+    private boolean insertCategory(SQLiteDatabase db,String name, String descr, double budget){
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CAT_NAME,name);
+        contentValues.put(CAT_DESCR,descr);
+        contentValues.put(BUDGET,budget);
+        contentValues.put(USER_ID,1);
+
+        return db.insert(CAT_TABLE, null, contentValues)>0;
+
+    }
+
+    private void reportTrigger(String date,int transactionID){
+
+        ContentValues contentValues=new ContentValues();
+        Transaction transaction = getLastTransaction();
+
+        contentValues.put(USER_ID,transaction.getUser().getId());
+        contentValues.put(CAT_ID,transaction.getCategory().getId());
+        contentValues.put(TRAN_ID,transaction.getTran_id());
+
+
+
+    }
+
+    private Transaction getLastTransaction(){
+        Transaction transaction = null;
+        Cursor cursor = null;
+        SQLiteDatabase db= getReadableDatabase();
+
+        cursor = db.query(TRAN_TABLE, null,
+                TRAN_ID+" = ?", new String[] { "(select max("+TRAN_ID+") from "+TRAN_TABLE+"):"},null,null,null);
+
+        if (cursor.moveToFirst()) {
+
+            int tranID = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
+            String tran_name = cursor.getString(cursor.getColumnIndex(TRAN_NAME));
+            String description= cursor.getString(cursor.getColumnIndex(TRAN_DESCR));
+            double amount = cursor.getDouble(cursor.getColumnIndex(TRAN_AMOUNT));
+            String date= cursor.getString(cursor.getColumnIndex(DATE));
+            int catID = cursor.getInt(cursor.getColumnIndex(CAT_ID));
+
+            transaction= new Transaction(tranID, tran_name, amount, date, getCategoryById(catID).getUser(),getCategoryById(catID));
+
+
+        }
+
+        return transaction;
     }
 }
