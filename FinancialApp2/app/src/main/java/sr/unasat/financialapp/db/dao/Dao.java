@@ -12,6 +12,7 @@ import java.util.List;
 
 import sr.unasat.financialapp.dto.Category;
 import sr.unasat.financialapp.dto.Currency;
+import sr.unasat.financialapp.dto.Transaction;
 import sr.unasat.financialapp.dto.User;
 
 import static android.content.ContentValues.TAG;
@@ -31,6 +32,11 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_LOGO;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.CREATE_REPTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.CREATE_TRANTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DATE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_AMOUNT;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_DESCR;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_ID;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_NAME;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_TABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CLOSING;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CREATED;
@@ -191,5 +197,79 @@ public class Dao extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         return db.insert(TRAN_TABLE, null, contentValues)>0;
+    }
+
+    public Transaction getTransactionByID( int id ){
+        Transaction transaction=null;
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+
+        cursor = db.query(TRAN_TABLE, null,
+                TRAN_ID+" = ?", new String[] { "" + id },null,null,null);
+        if (cursor.moveToFirst()) {
+
+            int tranID = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
+            String name = cursor.getString(cursor.getColumnIndex(TRAN_NAME));
+            String description= cursor.getString(cursor.getColumnIndex(TRAN_DESCR));
+            double amount = cursor.getDouble(cursor.getColumnIndex(TRAN_AMOUNT));
+            String date= cursor.getString(cursor.getColumnIndex(DATE));
+            int catID = cursor.getInt(cursor.getColumnIndex(CAT_ID));
+
+            transaction= new Transaction(tranID, name, amount, date, getCategoryById(catID).getUser(),getCategoryById(catID));
+
+
+        }
+
+        return transaction;
+    }
+
+    public Transaction getTransactionByName( String name ){
+        Transaction transaction=null;
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+
+        cursor = db.query(TRAN_TABLE, null,
+                TRAN_NAME+" = ?", new String[] { "" + name },null,null,null);
+        if (cursor.moveToFirst()) {
+
+            int tranID = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
+            String tran_name = cursor.getString(cursor.getColumnIndex(TRAN_NAME));
+            String description= cursor.getString(cursor.getColumnIndex(TRAN_DESCR));
+            double amount = cursor.getDouble(cursor.getColumnIndex(TRAN_AMOUNT));
+            String date= cursor.getString(cursor.getColumnIndex(DATE));
+            int catID = cursor.getInt(cursor.getColumnIndex(CAT_ID));
+
+            transaction= new Transaction(tranID, tran_name, amount, date, getCategoryById(catID).getUser(),getCategoryById(catID));
+
+
+        }
+
+        return transaction;
+    }
+
+    public List<Transaction> getTransactions(){
+        List<Transaction> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Transaction transaction;
+
+        Cursor cursor = null;
+        cursor = db.query(TRAN_TABLE,null,null,null,null,null,null);
+
+        if (cursor .moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
+                transaction = getTransactionByID(id);
+
+                cursor.moveToNext();
+
+                list.add(transaction);
+
+            }while (cursor.isAfterLast() == false);
+
+        }
+
+        return list;
     }
 }

@@ -5,7 +5,6 @@ public class Transaction {
     private long tran_id;
     private String tran_name;
     private double tran_amount;
-    private String tran_type;
     private String tran_date;
     private User user;
     private Category category;
@@ -14,11 +13,10 @@ public class Transaction {
 
     }
 
-    public Transaction(long tran_id, String tran_name, double tran_amount, String tran_type, String tran_date, User user, Category category) {
+    public Transaction(long tran_id, String tran_name, double tran_amount, String tran_date, User user, Category category) {
         this.tran_id = tran_id;
         this.tran_name = tran_name;
         this.tran_amount = tran_amount;
-        this.tran_type = tran_type;
         this.tran_date = tran_date;
         this.user = user;
         this.category = category;
@@ -46,14 +44,6 @@ public class Transaction {
 
     public void setTran_amount(double tran_amount) {
         this.tran_amount = tran_amount;
-    }
-
-    public String getTran_type() {
-        return tran_type;
-    }
-
-    public void setTran_type(String tran_type) {
-        this.tran_type = tran_type;
     }
 
     public String getTran_date() {

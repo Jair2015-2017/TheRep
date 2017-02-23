@@ -118,5 +118,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         addTransactionDialog.addTransaction();
 
-    }
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_container, new BalanceFragment()).commit();
+
+        getSupportActionBar().setTitle(getResources().getString(R.string.balance));
+
+          }
 }
