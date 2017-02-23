@@ -9,7 +9,7 @@ public class User {
     private double opening;
     private double transactions;
     private double closing;
-    private String currency;
+    private Currency currency;
 
     //additional info
     private String nameUser;
@@ -24,7 +24,7 @@ public class User {
         //empty constructor
     }
 
-    public User(int id, String password, String email, String created, double opening, String currency) {
+    public User(int id, String password, String email, String created, double opening, Currency currency) {
         this.id = id;
         this.password = password;
         this.email = email;
@@ -33,7 +33,7 @@ public class User {
         this.currency = currency;
     }
 
-    public User(int id, String password, String email, String created, double opening, double transactions, double closing, String currency, String nameUser, String surname, String birthDate, String gender) {
+    public User(int id, String password, String email, String created, double opening, double transactions, double closing, Currency currency, String nameUser, String surname, String birthDate, String gender) {
         this.id = id;
         this.password = password;
         this.email = email;
@@ -48,11 +48,11 @@ public class User {
         this.gender = gender;
     }
 
-    public String getCurrency() {
+    public Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(Currency currency) {
         this.currency = currency;
     }
 

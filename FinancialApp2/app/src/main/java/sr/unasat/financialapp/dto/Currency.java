@@ -1,16 +1,16 @@
 package sr.unasat.financialapp.dto;
 
-public class Currencies {
+public class Currency {
 
     private int id;
     private String country;
     private String currency;
     private String logo;
 
-    public Currencies() {
+    public Currency() {
     }
 
-    public Currencies(int id, String country, String currency, String logo) {
+    public Currency(int id, String country, String currency, String logo) {
         this.id = id;
         this.country = country;
         this.currency = currency;

@@ -4,14 +4,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
 import sr.unasat.financialapp.R;
+import sr.unasat.financialapp.activities.main.fragments.AddTransactionDialog;
 import sr.unasat.financialapp.activities.main.fragments.BalanceFragment;
 import sr.unasat.financialapp.activities.main.fragments.BudgetsFragment;
 import sr.unasat.financialapp.activities.main.fragments.CategoriesFragment;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+    AddTransactionDialog addTransactionDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,4 +104,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    public void floatingButtonEvent(View view){
+        addTransactionDialog = new AddTransactionDialog();
+        addTransactionDialog.show(getSupportFragmentManager(),"add_tran_diag");
+    }
+
+    public void cancelTransactionEvent(View view){
+        addTransactionDialog.getDialog().dismiss();
+        Toast.makeText(this, "no transaction added", Toast.LENGTH_SHORT).show();
+    }
+
+    public void okTransactionEvent(View view){
+
+        addTransactionDialog.addTransaction();
+
+    }
 }

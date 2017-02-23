@@ -26,5 +26,4 @@ public class BalanceFragment extends Fragment {
     }
 
 
-
 }
