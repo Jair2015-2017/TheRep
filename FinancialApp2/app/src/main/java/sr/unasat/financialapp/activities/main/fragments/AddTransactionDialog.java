@@ -1,6 +1,7 @@
 package sr.unasat.financialapp.activities.main.fragments;
 
 
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -22,18 +23,23 @@ import java.util.List;
 import sr.unasat.financialapp.R;
 import sr.unasat.financialapp.db.dao.Dao;
 import sr.unasat.financialapp.dto.Category;
+import sr.unasat.financialapp.dto.Transaction;
 
 import static android.content.ContentValues.TAG;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaCategory.CAT_ID;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DATE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_AMOUNT;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_NAME;
 
 public class AddTransactionDialog extends DialogFragment {
 
-    Category category;
+    Category category;Dao dao;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_transaction_dialog, container, false);
-        final Dao dao = new Dao(getActivity());
+        dao = new Dao(getActivity());
         List<Category> categories = dao.getCategories();
         List<String>categorynames = new ArrayList<>();
         for (Category category:categories){
@@ -84,9 +90,22 @@ public class AddTransactionDialog extends DialogFragment {
             String transactionName= String.valueOf(transactionNameView.getText());
             double transactionAmount = Double.valueOf(String.valueOf(transactionAmountView.getText()));
             String date = String.valueOf(Calendar.getInstance().getTime());
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(TRAN_NAME,transactionName);
+            contentValues.put(TRAN_AMOUNT,transactionAmount);
+            contentValues.put(DATE,date);
+            contentValues.put(CAT_ID,category.getId());
+
+            if (dao.insertTransaction(contentValues))
+                Toast.makeText(getActivity(), "transaction inserted", Toast.LENGTH_SHORT).show();
+            else{
+                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+            }
+            dao.close();
 
 
             Toast.makeText(getActivity(), transactionName+"\n"+transactionAmount, Toast.LENGTH_SHORT).show();
+            getDialog().dismiss();
 
         }else{
 

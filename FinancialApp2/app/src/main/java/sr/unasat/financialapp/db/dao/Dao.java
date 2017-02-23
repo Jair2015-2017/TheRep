@@ -1,5 +1,6 @@
 package sr.unasat.financialapp.db.dao;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,6 +31,7 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_LOGO;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.CREATE_REPTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.CREATE_TRANTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.TRAN_TABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CLOSING;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CREATED;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.CREATE_USERTABLE;
@@ -182,5 +184,12 @@ public class Dao extends SQLiteOpenHelper {
 
         return list;
 
+    }
+
+
+    public boolean insertTransaction(ContentValues contentValues){
+
+        SQLiteDatabase db = getWritableDatabase();
+        return db.insert(TRAN_TABLE, null, contentValues)>0;
     }
 }
