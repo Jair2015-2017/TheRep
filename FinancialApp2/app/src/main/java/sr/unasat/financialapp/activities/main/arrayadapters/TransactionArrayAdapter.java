@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import sr.unasat.financialapp.R;
@@ -33,12 +35,14 @@ public class TransactionArrayAdapter extends ArrayAdapter<String> {
         TextView tranName = (TextView)customView.findViewById(R.id.transaction_name);
         TextView tranDescr = (TextView) customView.findViewById(R.id.transaction_descr);
         TextView tranVal = (TextView) customView.findViewById(R.id.transaction_value);
+        TextView tranDate = (TextView )customView.findViewById(R.id.tran_date_onCard);
 
         String cat_name=getItem(position);
         Transaction transaction = dao.getTransactionByName(cat_name);
         tranName.setText(transaction.getTran_name());
         tranDescr.setText(transaction.getCategory().getName());
         tranVal.setText(String.valueOf(transaction.getTran_amount()));
+        tranDate.setText(transaction.getTran_date());
 
 
 
