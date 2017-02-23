@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import sr.unasat.financialapp.dto.Category;
 import sr.unasat.financialapp.dto.Currency;
+import sr.unasat.financialapp.dto.Report;
 import sr.unasat.financialapp.dto.Transaction;
 import sr.unasat.financialapp.dto.User;
 import static android.content.ContentValues.TAG;
@@ -33,6 +33,7 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_LOGO;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.DROP_CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.CREATE_REPTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.DAY;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.WEEKDAY;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.DROP_REPTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.MONTH;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.REP_TABLE;
@@ -59,6 +60,7 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.TRANSACTIONS;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_TABLE;
 import static sr.unasat.financialapp.util.DateUtil.convertDate;
+import static sr.unasat.financialapp.util.DateUtil.int_to_month;
 
 public class Dao extends SQLiteOpenHelper {
 
@@ -369,6 +371,34 @@ public class Dao extends SQLiteOpenHelper {
         return transaction;
     }
 
+    public List<Transaction> getTransactionsByDay(int day,int year){
+        List<Transaction> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Transaction transaction;
+
+        Cursor cursor = db.query(
+                REP_TABLE,new String[]{DAY},
+                MONTH+" = ? and "+YEAR+" = ?", new String[] { "" + String.valueOf(day),String.valueOf(year)},null,null,null);
+
+
+
+        if (cursor .moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
+                transaction = getTransactionByID(id);
+
+                cursor.moveToNext();
+
+                list.add(transaction);
+
+            }while (cursor.isAfterLast() == false);
+
+        }
+
+        return list;
+    }
+
+
 
 
     private boolean insertReport(ContentValues contentValues){
@@ -376,8 +406,29 @@ public class Dao extends SQLiteOpenHelper {
         return getWritableDatabase().insert(REP_TABLE, null, contentValues)>0;
     }
 
+    public List<String> getDays(int month,int year){
+        SQLiteDatabase db = getReadableDatabase();
+        List<String> days=new ArrayList<>();
+        Cursor cursor = db.query(
+                REP_TABLE,new String[]{DAY},
+                MONTH+" = ? and "+YEAR+" = ?", new String[] { "" + String.valueOf(month),String.valueOf(year)},null,null,null);
 
+        if (cursor.moveToFirst()) {
+            do {
+                String day=String.valueOf(cursor.getInt(cursor.getColumnIndex(DAY)));
 
+                if (!days.contains(day+" "+int_to_month(month)+" "+year)){
+                    String date = day+" "+int_to_month(month)+" "+year;
+                    days.add(date);
+                }
+
+                cursor.moveToNext();
+
+            }while(!cursor.isAfterLast());
+        }
+
+        return days;
+    }
 
     private boolean reportTrigger(Transaction transaction){
 
@@ -392,7 +443,8 @@ public class Dao extends SQLiteOpenHelper {
         contentValues.put(YEAR,date[0]);
         contentValues.put(MONTH,date[1]);
         contentValues.put(WEEK,date[2]);
-        contentValues.put(DAY,date[3]);
+        contentValues.put(WEEKDAY,date[3]);
+        contentValues.put(DAY,date[4]);
 
         return insertReport(contentValues);
 

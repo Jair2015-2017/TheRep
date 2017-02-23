@@ -86,6 +86,7 @@ public class Schema {
     public class SchemaReport {
         public static final String REP_TABLE = "rep_table";
         public static final String REPORT_ID = "report_id";
+        public static final String WEEKDAY = "weekday";
         public static final String DAY = "day";
         public static final String WEEK = "week";
         public static final String MONTH = "month";
@@ -94,6 +95,7 @@ public class Schema {
         public static final String CREATE_REPTABLE =
                 "create table "+ REP_TABLE +" ( "+ REPORT_ID +" integer primary key, "
                         + DAY +" integer, "
+                        + WEEKDAY +" integer, "
                         + WEEK +" integer, "
                         + MONTH +" integer, "
                         + YEAR +" integer, "

@@ -21,6 +21,7 @@ import sr.unasat.financialapp.activities.main.fragments.CategoriesFragment;
 import sr.unasat.financialapp.activities.main.fragments.OverviewFragment;
 import sr.unasat.financialapp.activities.main.fragments.ReportsFragment;
 import sr.unasat.financialapp.activities.main.fragments.SettingsFragment;
+import sr.unasat.financialapp.db.dao.Dao;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //new Dao(this).getReadableDatabase();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

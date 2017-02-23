@@ -42,6 +42,54 @@ public class DateUtil {
         return dayInt;
     }
 
+    public static String int_to_month(int month){
+        String monthStr ;
+        switch (month){
+            case 1:
+                monthStr = "january";
+                break;
+            case 2:
+                monthStr = "february";
+                break;
+            case 3:
+                monthStr = "march";
+                break;
+            case 4:
+                monthStr = "april";
+                break;
+            case 5:
+                monthStr = "may";
+                break;
+            case 6:
+                monthStr = "june";
+                break;
+            case 7:
+                monthStr = "july";
+                break;
+            case 8:
+                monthStr = "august";
+                break;
+            case 9:
+                monthStr = "september";
+                break;
+            case 10:
+                monthStr = "october";
+                break;
+            case 11:
+                monthStr = "november";
+                break;
+            case 12:
+                monthStr = "december";
+                break;
+            default:
+                monthStr=null;
+        }
+
+
+        return monthStr;
+    }
+
+
     private static int month_to_int(String monthStr){
 
         int monthInt ;
@@ -112,8 +160,9 @@ public class DateUtil {
 
         int weekYear =(int) Math.round((((original + day) - weekday) + 10)/7);
 
-        return new int[] {year,month,weekYear,weekday};
+        return new int[] {year,month,weekYear,weekday,day};
     }
+
 
 
 
