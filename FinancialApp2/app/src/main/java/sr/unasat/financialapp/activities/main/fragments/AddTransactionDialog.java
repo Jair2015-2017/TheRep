@@ -50,7 +50,7 @@ public class AddTransactionDialog extends DialogFragment {
 
         }
 
-        final Spinner spinner = (Spinner)view.findViewById(R.id.trandialog_category_spinner);
+        Spinner spinner = (Spinner)view.findViewById(R.id.trandialog_category_spinner);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_layout,R.id.spinner_item, categorynames);
 

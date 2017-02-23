@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public void floatingButtonEvent(View view){
+    public void balance_floatingButtonEvent(View view){
         addTransactionDialog = new AddTransactionDialog();
         addTransactionDialog.show(getSupportFragmentManager(),"add_tran_diag");
     }
@@ -122,5 +122,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         getSupportActionBar().setTitle(getResources().getString(R.string.balance));
 
-          }
+    }
 }
