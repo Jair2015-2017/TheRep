@@ -112,7 +112,7 @@ public class DateUtil {
 
         int weekYear =(int) Math.round((((original + day) - weekday) + 10)/7);
 
-        return new int[] {weekday,weekYear,month,year};
+        return new int[] {year,month,weekYear,weekday};
     }
 
 

@@ -41,6 +41,8 @@ public class BalanceFragment extends Fragment {
         TransactionArrayAdapter adapter = new TransactionArrayAdapter(getActivity(),transactionNames);
         listView.setAdapter(adapter);
 
+        closingView.setText(String.valueOf(dao.getUserById(1).getClosing()));
+
 
         return view;
     }

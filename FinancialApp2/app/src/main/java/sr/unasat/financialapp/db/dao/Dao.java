@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import sr.unasat.financialapp.dto.Category;
 import sr.unasat.financialapp.dto.Currency;
@@ -30,7 +32,12 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.CUR_LOGO;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaCurrency.DROP_CURTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.CREATE_REPTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.DAY;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.DROP_REPTABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.MONTH;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.REP_TABLE;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.WEEK;
+import static sr.unasat.financialapp.db.schema.Schema.SchemaReport.YEAR;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.CREATE_TRANTABLE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DATE;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaTransaction.DROP_TRANTABLE;
@@ -51,6 +58,7 @@ import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.SURNAME;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.TRANSACTIONS;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_ID;
 import static sr.unasat.financialapp.db.schema.Schema.SchemaUser.USER_TABLE;
+import static sr.unasat.financialapp.util.DateUtil.convertDate;
 
 public class Dao extends SQLiteOpenHelper {
 
@@ -164,6 +172,19 @@ public class Dao extends SQLiteOpenHelper {
         return user;
     }
 
+
+    private boolean insertCategory(SQLiteDatabase db,String name, String descr, double budget){
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CAT_NAME,name);
+        contentValues.put(CAT_DESCR,descr);
+        contentValues.put(BUDGET,budget);
+        contentValues.put(USER_ID,1);
+
+        return db.insert(CAT_TABLE, null, contentValues)>0;
+
+    }
+
     public Category getCategoryById( int id ){
         Category category = null;
         SQLiteDatabase db = getReadableDatabase();
@@ -235,11 +256,15 @@ public class Dao extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
 
-        String date = String.valueOf(contentValues.get(DATE));
+        //String date = String.valueOf(contentValues.get(DATE));
 
         if (db.insert(TRAN_TABLE, null, contentValues)>0){
-            Transaction transaction = getLastTransaction();
-            reportTrigger(date,transaction.getTran_id());
+
+            Transaction transaction=getLastTransaction();
+            reportTrigger(transaction);
+            balanceTrigger(transaction);
+            Log.i(TAG, "insertTransaction: succes");
+
             return true;
         }else {
             return false;
@@ -322,40 +347,14 @@ public class Dao extends SQLiteOpenHelper {
         return list;
     }
 
-    private boolean insertCategory(SQLiteDatabase db,String name, String descr, double budget){
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(CAT_NAME,name);
-        contentValues.put(CAT_DESCR,descr);
-        contentValues.put(BUDGET,budget);
-        contentValues.put(USER_ID,1);
-
-        return db.insert(CAT_TABLE, null, contentValues)>0;
-
-    }
-
-    private void reportTrigger(String date,int transactionID){
-
-        ContentValues contentValues=new ContentValues();
-        Transaction transaction = getLastTransaction();
-
-        contentValues.put(USER_ID,transaction.getUser().getId());
-        contentValues.put(CAT_ID,transaction.getCategory().getId());
-        contentValues.put(TRAN_ID,transaction.getTran_id());
-
-
-
-    }
-
     private Transaction getLastTransaction(){
         Transaction transaction = null;
         Cursor cursor = null;
         SQLiteDatabase db= getReadableDatabase();
 
-        cursor = db.query(TRAN_TABLE, null,
-                TRAN_ID+" = ?", new String[] { "(select max("+TRAN_ID+") from "+TRAN_TABLE+"):"},null,null,null);
+        cursor = db.query(TRAN_TABLE,null,null,null,null,null,null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor.moveToLast()) {
 
             int tranID = cursor.getInt(cursor.getColumnIndex(TRAN_ID));
             String tran_name = cursor.getString(cursor.getColumnIndex(TRAN_NAME));
@@ -365,10 +364,61 @@ public class Dao extends SQLiteOpenHelper {
             int catID = cursor.getInt(cursor.getColumnIndex(CAT_ID));
 
             transaction= new Transaction(tranID, tran_name, amount, date, getCategoryById(catID).getUser(),getCategoryById(catID));
-
-
         }
 
         return transaction;
     }
+
+
+
+    private boolean insertReport(ContentValues contentValues){
+
+        return getWritableDatabase().insert(REP_TABLE, null, contentValues)>0;
+    }
+
+
+
+
+    private boolean reportTrigger(Transaction transaction){
+
+        ContentValues contentValues=new ContentValues();
+
+        contentValues.put(USER_ID,transaction.getUser().getId());
+        contentValues.put(CAT_ID,transaction.getCategory().getId());
+        contentValues.put(TRAN_ID,transaction.getTran_id());
+
+        int[] date= convertDate(Calendar.getInstance().getTime());
+
+        contentValues.put(YEAR,date[0]);
+        contentValues.put(MONTH,date[1]);
+        contentValues.put(WEEK,date[2]);
+        contentValues.put(DAY,date[3]);
+
+        return insertReport(contentValues);
+
+    }
+
+    private boolean balanceTrigger(Transaction transaction){
+
+        double amount = transaction.getTran_amount();
+        User user = transaction.getUser();
+
+        double transactionsValue = user.getTransactions();
+        double opening = user.getOpening();
+
+        double newValue = transactionsValue+amount;
+        double closing = opening-newValue;
+
+        ContentValues contentValues =new ContentValues();
+
+
+        contentValues.put(TRANSACTIONS,newValue);
+        contentValues.put(CLOSING,closing);
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        return db.update(USER_TABLE, contentValues, USER_ID+ " = " + user.getId(), null)>0;
+    }
+
+
 }
